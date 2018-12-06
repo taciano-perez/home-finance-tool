@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 public class OperationTagger {
 
     public Statement tagStatement(Statement inputStatement, Tag tag) {
-        Statement outputStatement = new Statement();
-        for (Operation operation : inputStatement.getOperationList()) {
+        final Statement outputStatement = new Statement();
+        for (final Operation operation : inputStatement.getOperationList()) {
             if (matchesTag(operation, tag)) {
                 operation.addTag(tag);
                 outputStatement.addOperation(operation);

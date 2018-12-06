@@ -16,12 +16,10 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class InputTabFileReader implements InputFileReader {
-
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static final String VALUE_PATTERN = "#,##0.0#";
 
     public Statement readFile(String fileName) throws IOException {
-
         Statement statement = new Statement();
 
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
@@ -32,7 +30,6 @@ public class InputTabFileReader implements InputFileReader {
     }
 
     private void parseLine(String line, Statement statement) {
-
         Operation operation = new Operation();
 
         String[] cols = line.split("\\t");
@@ -56,13 +53,23 @@ public class InputTabFileReader implements InputFileReader {
             e.printStackTrace();
         }
         // description (7)
-        String[] descCols = cols[7].split("\\s+");
-        int skip = 3;
-        if (descCols[0].startsWith("/TRTP/SEPA")) {
-            skip = 1;
+        String entry = cols[7];
+        if (entry.startsWith("/TRTP")) {
+            parseTrtpEntry(entry, operation);
+        } else if (entry.startsWith("ABN AMRO Bank N.V.")) {
+            parseAbnAmroEntry(entry, operation);
+        } else {
+            // BEA or GEA entry
+            parseBeaEntry(entry, operation);
         }
+
+        statement.addOperation(operation);
+    }
+
+    private void parseBeaEntry(String beaEntry, Operation operation) {
+        String[] descCols = beaEntry.split("\\s+");
         StringBuilder descriptionBuilder = new StringBuilder();
-        Arrays.stream(descCols).skip(skip).forEach(chunk -> descriptionBuilder.append(chunk + " "));
+        Arrays.stream(descCols).skip(3).forEach(chunk -> descriptionBuilder.append(chunk).append(" "));
         String descPlusPasNummer = descriptionBuilder.toString();
         if (descPlusPasNummer.contains(",PAS")) {
             String[] descParts = descriptionBuilder.toString().split(",PAS");
@@ -70,8 +77,24 @@ public class InputTabFileReader implements InputFileReader {
         } else {
             operation.setDescription(descPlusPasNummer);
         }
+    }
 
-        statement.addOperation(operation);
+    private void parseTrtpEntry(String trtpEntry, Operation operation) {
+        String[] entryCols = trtpEntry.split("/");
+        int offset = 0;
+        for (int i = 0; i < entryCols.length; i++) {
+            if ("NAME".equals(entryCols[i])) {
+                offset = i + 1;
+                break;
+            }
+        }
+        String name = entryCols[offset];
+        operation.setDescription(name);
+    }
+
+    private void parseAbnAmroEntry(String abnAmroEntry, Operation operation) {
+        String descriptionPart = abnAmroEntry.substring(33, 61).trim();
+        operation.setDescription(descriptionPart);
     }
 
     private BigDecimal parseBigDecimal(String string) throws ParseException {

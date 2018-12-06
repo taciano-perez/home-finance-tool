@@ -5,7 +5,14 @@ import java.util.List;
 
 public class Statement {
 
-    List<Operation> operationList = new ArrayList<>();
+    private List<Operation> operationList = new ArrayList<>();
+
+    public Statement() {
+    }
+
+    public Statement(List<Operation> operationList) {
+        this.operationList = operationList;
+    }
 
     public List<Operation> getOperationList() {
         return operationList;
@@ -18,7 +25,7 @@ public class Statement {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        this.getOperationList().stream().forEach(operation -> builder.append(operation + "\n"));
+        this.getOperationList().forEach(operation -> builder.append(operation).append("\n"));
         return builder.toString();
     }
 }

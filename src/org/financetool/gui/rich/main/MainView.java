@@ -15,6 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.financetool.domain.Statement;
 import org.financetool.domain.Tag;
+import org.financetool.file.input.InputDirectoryReader;
 import org.financetool.file.input.InputFileReader;
 import org.financetool.file.input.InputTabFileReader;
 import org.financetool.file.input.TagFileReader;
@@ -44,7 +45,7 @@ public class MainView extends Application implements Initializable {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+        final Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
         primaryStage.setTitle("Home Finance Tool");
         primaryStage.setScene(new Scene(root, 1000, 875));
         primaryStage.show();
@@ -52,18 +53,18 @@ public class MainView extends Application implements Initializable {
     }
 
     private Statement loadStatement() {
-        final String fileName = "./test/data/TXT181202171552.TAB";
-        System.out.println("Importing data from " + fileName);
-        InputFileReader inputFileReader = new InputTabFileReader();
+        final String inputDirName = "./resources/data/input";
+        System.out.println("Importing data from directory " + inputDirName);
+        final InputDirectoryReader inputDirectoryReader = new InputDirectoryReader();
         Statement taggedStatement = null;
         try {
-            Statement statement = inputFileReader.readFile(fileName);
+            final Statement statement = inputDirectoryReader.readAllFilesInDir(inputDirName);
 
-            final String tagFileName = "./test/data/category-bills.txt";
-            TagFileReader tagFileReader = new TagFileReader();
-            Tag billTag = tagFileReader.readTagInputFile("Bill", tagFileName);
+            final String tagFileName = "./resources/data/tags/category-bills.txt";
+            final TagFileReader tagFileReader = new TagFileReader();
+            final Tag billTag = tagFileReader.readTagInputFile("Bill", tagFileName);
 
-            OperationTagger tagger = new OperationTagger();
+            final OperationTagger tagger = new OperationTagger();
             taggedStatement = tagger.tagStatement(statement, billTag);
         } catch (IOException e) {
             e.printStackTrace();
