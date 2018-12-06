@@ -3,6 +3,19 @@
 A tool to simplify managing bank account statements.
 
 ## TODO list
+
+### Features
+* Allow filter by date
+* Allow filter by salary period
+* Allow filter by tag
+* Improve statement parsing
+
+### UI
 * Fix table selection issues
-* Use logging API
 * Make UI reactive
+
+### Code improvements
+* Use logging API
+* Write javadoc
+* Extract constants
+* Create utility class for date and monetary value formatting
