@@ -9,7 +9,7 @@ A tool to simplify managing bank account statements.
 * Allow filter by salary period
 * Allow filter by tag
 * Improve statement parsing
-* * Reconcile statements
+  * Reconcile statements
 
 ### UI
 * Fix table selection issues
