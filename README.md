@@ -5,11 +5,12 @@ A tool to simplify managing bank account statements.
 ## TODO list
 
 ### Features
-* Allow filter by date
-* Allow filter by salary period
-* Allow filter by tag
+* Filter by date
+* Filter by salary period
+* Filter by tag
 * Improve statement parsing
   * Reconcile statements
+* Named tags
 
 ### UI
 * Fix table selection issues
