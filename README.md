@@ -5,6 +5,7 @@ A tool to simplify managing bank account statements.
 ## TODO list
 
 ### Features
+* Display tags
 * Filter by date
 * Filter by salary period
 * Filter by tag
@@ -12,6 +13,7 @@ A tool to simplify managing bank account statements.
   * Reconcile statements
   * Save parsed data
 * Named tags
+* Configure multiple tags
 
 ### UI
 * ~~Fix table selection issues~~
