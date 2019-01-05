@@ -1,24 +1,21 @@
 package org.financetool.util;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.StringTokenizer;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
+import org.financetool.gui.rich.main.OperationTableRow;
+
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 public class TableUtils {
 
@@ -27,8 +24,9 @@ public class TableUtils {
 
     /**
      * Install the keyboard handler:
-     *   + CTRL + C = copy to clipboard
-     *   + CTRL + V = paste to clipboard
+     * + CTRL + C = copy to clipboard
+     * + CTRL + V = paste to clipboard
+     *
      * @param table
      */
     public static void installCopyPasteHandler(TableView<?> table) {
@@ -51,23 +49,22 @@ public class TableUtils {
 
             if (copyKeyCodeCompination.match(keyEvent)) {
 
-                if( keyEvent.getSource() instanceof TableView) {
+                if (keyEvent.getSource() instanceof TableView) {
 
                     // copy to clipboard
-                    copySelectionToClipboard( (TableView<?>) keyEvent.getSource());
+                    copySelectionToClipboard((TableView<?>) keyEvent.getSource());
 
                     // event is handled, consume it
                     keyEvent.consume();
 
                 }
 
-            }
-            else if (pasteKeyCodeCompination.match(keyEvent)) {
+            } else if (pasteKeyCodeCompination.match(keyEvent)) {
 
-                if( keyEvent.getSource() instanceof TableView) {
+                if (keyEvent.getSource() instanceof TableView) {
 
                     // copy to clipboard
-                    pasteFromClipboard( (TableView<?>) keyEvent.getSource());
+                    pasteFromClipboard((TableView<?>) keyEvent.getSource());
 
                     // event is handled, consume it
                     keyEvent.consume();
@@ -82,66 +79,34 @@ public class TableUtils {
 
     /**
      * Get table selection and copy it to the clipboard.
+     *
      * @param table
      */
     public static void copySelectionToClipboard(TableView<?> table) {
 
         StringBuilder clipboardString = new StringBuilder();
 
-        ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
+        List<OperationTableRow> selectedItems = table.getSelectionModel().getSelectedItems().stream()
+                .filter(obj -> obj instanceof OperationTableRow)
+                .map(obj -> (OperationTableRow) obj).collect(Collectors.toList());
 
-        int prevRow = -1;
+        boolean isFirstRow = true;
 
-        for (TablePosition position : positionList) {
+        for (OperationTableRow row : selectedItems) {
 
-            int row = position.getRow();
-            int col = position.getColumn();
-
-            // determine whether we advance in a row (tab) or a column
-            // (newline).
-            if (prevRow == row) {
-
-                clipboardString.append('\t');
-
-            } else if (prevRow != -1) {
-
+            // append /n between lines (except first row)
+            if (isFirstRow) {
+                isFirstRow = false;
+            } else {
                 clipboardString.append('\n');
-
-            }
-
-            // create string from cell
-            String text = "";
-
-            Object observableValue = (Object) table.getColumns().get(col).getCellObservableValue( row);
-
-            // null-check: provide empty string for nulls
-            if (observableValue == null) {
-                text = "";
-            }
-            else if( observableValue instanceof DoubleProperty) { // TODO: handle boolean etc
-
-                text = numberFormatter.format( ((DoubleProperty) observableValue).get());
-
-            }
-            else if( observableValue instanceof IntegerProperty) {
-
-                text = numberFormatter.format( ((IntegerProperty) observableValue).get());
-
-            }
-            else if( observableValue instanceof StringProperty) {
-
-                text = ((StringProperty) observableValue).get();
-
-            }
-            else {
-                System.out.println("Unsupported observable value: " + observableValue);
             }
 
             // add new item to clipboard
-            clipboardString.append(text);
-
-            // remember previous
-            prevRow = row;
+            clipboardString.append(row.getDateAsString());
+            clipboardString.append('\t');
+            clipboardString.append(row.getValue());
+            clipboardString.append('\t');
+            clipboardString.append(row.getDescription());
         }
 
         // create clipboard content
@@ -150,14 +115,12 @@ public class TableUtils {
 
         // set clipboard content
         Clipboard.getSystemClipboard().setContent(clipboardContent);
-
-
     }
 
-    public static void pasteFromClipboard( TableView<?> table) {
+    public static void pasteFromClipboard(TableView<?> table) {
 
         // abort if there's not cell selected to start with
-        if( table.getSelectionModel().getSelectedCells().size() == 0) {
+        if (table.getSelectionModel().getSelectedCells().size() == 0) {
             return;
         }
 
@@ -172,18 +135,18 @@ public class TableUtils {
 
         int rowClipboard = -1;
 
-        StringTokenizer rowTokenizer = new StringTokenizer( pasteString, "\n");
-        while( rowTokenizer.hasMoreTokens()) {
+        StringTokenizer rowTokenizer = new StringTokenizer(pasteString, "\n");
+        while (rowTokenizer.hasMoreTokens()) {
 
             rowClipboard++;
 
             String rowString = rowTokenizer.nextToken();
 
-            StringTokenizer columnTokenizer = new StringTokenizer( rowString, "\t");
+            StringTokenizer columnTokenizer = new StringTokenizer(rowString, "\t");
 
             int colClipboard = -1;
 
-            while( columnTokenizer.hasMoreTokens()) {
+            while (columnTokenizer.hasMoreTokens()) {
 
                 colClipboard++;
 
@@ -195,10 +158,10 @@ public class TableUtils {
                 int colTable = pasteCellPosition.getColumn() + colClipboard;
 
                 // skip if we reached the end of the table
-                if( rowTable >= table.getItems().size()) {
+                if (rowTable >= table.getItems().size()) {
                     continue;
                 }
-                if( colTable >= table.getColumns().size()) {
+                if (colTable >= table.getColumns().size()) {
                     continue;
                 }
 
@@ -208,10 +171,10 @@ public class TableUtils {
                 TableColumn tableColumn = table.getColumns().get(colTable);
                 ObservableValue observableValue = tableColumn.getCellObservableValue(rowTable);
 
-                System.out.println( rowTable + "/" + colTable + ": " +observableValue);
+                System.out.println(rowTable + "/" + colTable + ": " + observableValue);
 
                 // TODO: handle boolean, etc
-                if( observableValue instanceof DoubleProperty) {
+                if (observableValue instanceof DoubleProperty) {
 
                     try {
 
@@ -222,8 +185,7 @@ public class TableUtils {
                         e.printStackTrace();
                     }
 
-                }
-                else if( observableValue instanceof IntegerProperty) {
+                } else if (observableValue instanceof IntegerProperty) {
 
                     try {
 
@@ -234,8 +196,7 @@ public class TableUtils {
                         e.printStackTrace();
                     }
 
-                }
-                else if( observableValue instanceof StringProperty) {
+                } else if (observableValue instanceof StringProperty) {
 
                     ((StringProperty) observableValue).set(clipboardCellContent);
 

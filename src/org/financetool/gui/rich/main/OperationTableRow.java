@@ -1,40 +1,51 @@
 package org.financetool.gui.rich.main;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.financetool.domain.Operation;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class OperationTableRow {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    public static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final SimpleStringProperty date;
+    private final ObjectProperty<LocalDate> date;
     private final SimpleStringProperty value;
     private final SimpleStringProperty description;
 
     public OperationTableRow(Operation operation) {
-        this.date = new SimpleStringProperty(DATE_FORMAT.format(operation.getDate()));
+        this.date = new SimpleObjectProperty(operation.getDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate());
         this.value = new SimpleStringProperty(currencyFormat(operation.getValue()));
         this.description = new SimpleStringProperty(operation.getDescription());
     }
 
     public static String currencyFormat(BigDecimal n) {
-        return NumberFormat.getCurrencyInstance().format(n);
+        return NumberFormat.getCurrencyInstance(new Locale("nl", "NL")).format(n);
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date.get();
     }
 
-    public SimpleStringProperty dateProperty() {
-        return date;
+    public String getDateAsString() {
+        return DATE_FORMAT.format(this.getDate());
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date.set(date);
+    }
+
+    public ObjectProperty<LocalDate> dateProperty() {
+        return date;
     }
 
     public String getValue() {

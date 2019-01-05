@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,14 +17,13 @@ import javafx.stage.Stage;
 import org.financetool.domain.Statement;
 import org.financetool.domain.Tag;
 import org.financetool.file.input.InputDirectoryReader;
-import org.financetool.file.input.InputFileReader;
-import org.financetool.file.input.InputTabFileReader;
 import org.financetool.file.input.TagFileReader;
 import org.financetool.task.OperationTagger;
 import org.financetool.util.TableUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class MainView extends Application implements Initializable {
     @FXML
     private TableView<OperationTableRow> statementTable;
     @FXML
-    private TableColumn<OperationTableRow, String> dateCol;
+    private TableColumn<OperationTableRow, LocalDate> dateCol;
     @FXML
     private TableColumn<OperationTableRow, String> valueCol;
     @FXML
@@ -78,11 +78,23 @@ public class MainView extends Application implements Initializable {
         valueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 
+        dateCol.setCellFactory(column -> new TableCell<OperationTableRow, LocalDate>() {
+            @Override
+            protected void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty) {
+                    setText("");
+                } else {
+                    setText(OperationTableRow.DATE_FORMAT.format(date));
+                }
+            }
+        });
+
         statementTable.setItems(operationsList());
 
         // enable table multi-selection
-        statementTable.getSelectionModel().setCellSelectionEnabled(true);
         statementTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         // enable table copy/paste
         TableUtils.installCopyPasteHandler(statementTable);
 
