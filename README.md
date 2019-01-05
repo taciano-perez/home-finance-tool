@@ -14,8 +14,8 @@ A tool to simplify managing bank account statements.
 * Named tags
 
 ### UI
-* Fix table selection issues
-* Make UI reactive
+* ~~Fix table selection issues
+* ~~Make UI reactive
 
 ### Code improvements
 * Use logging API
