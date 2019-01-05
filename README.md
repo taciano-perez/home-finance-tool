@@ -10,6 +10,7 @@ A tool to simplify managing bank account statements.
 * Filter by tag
 * Improve statement parsing
   * Reconcile statements
+  * Save parsed data
 * Named tags
 
 ### UI
