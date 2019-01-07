@@ -19,7 +19,6 @@ import org.financetool.domain.Tag;
 import org.financetool.file.input.InputDirectoryReader;
 import org.financetool.file.input.TagFileReader;
 import org.financetool.task.OperationTagger;
-import org.financetool.util.TableUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -96,7 +95,7 @@ public class MainView extends Application implements Initializable {
         statementTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // enable table copy/paste
-        TableUtils.installCopyPasteHandler(statementTable);
+        OperationTableClipboardController.installCopyPasteHandler(statementTable);
 
     }
 

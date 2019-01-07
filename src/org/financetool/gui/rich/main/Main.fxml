@@ -9,19 +9,17 @@
       prefHeight="875.0" prefWidth="1400.0" spacing="20.0" style="-fx-background-color: DARKCYAN;"
       xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.financetool.gui.rich.main.MainView">
-    <children>
-        <VBox prefHeight="884.0" prefWidth="210.0" style="-fx-background-color: #93B7BE;"/>
-        <TableView layoutX="257.0" layoutY="220.0" prefHeight="584.0" prefWidth="1087.0" fx:id="statementTable">
-            <columnResizePolicy>
-                <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
-            </columnResizePolicy>
-            <columns>
-                <TableColumn text="Date" fx:id="dateCol" prefWidth="100.0"/>
-                <TableColumn text="Value" style="-fx-alignment: CENTER-RIGHT;" fx:id="valueCol" prefWidth="200.0"/>
-                <TableColumn text="Description" fx:id="descriptionCol" prefWidth="500.0"/>
-            </columns>
-        </TableView>
-    </children>
+    <VBox prefHeight="884.0" prefWidth="210.0" style="-fx-background-color: #93B7BE;"/>
+    <TableView layoutX="257.0" layoutY="220.0" prefHeight="584.0" prefWidth="1087.0" fx:id="statementTable">
+        <columnResizePolicy>
+            <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+        <columns>
+            <TableColumn text="Date" fx:id="dateCol" prefWidth="100.0"/>
+            <TableColumn text="Description" fx:id="descriptionCol" prefWidth="500.0"/>
+            <TableColumn text="Value" style="-fx-alignment: CENTER-RIGHT;" fx:id="valueCol" prefWidth="200.0"/>
+        </columns>
+    </TableView>
     <padding>
         <Insets bottom="50.0" left="50.0" right="50.0" top="50.0"/>
     </padding>
